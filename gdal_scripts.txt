@@ -1,0 +1,10 @@
+
+# 
+gdal_rasterize -burn 20 -add -l canada_rails canada_roads.shp cec/CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif
+gdal_rasterize -burn 21 -add -l canada_roads canada_rails.shp cec/CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif
+gdal_rasterize -burn 22 -add -l transmission_lines transmission_lines.shp cec/CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif
+
+
+gdal_calc.py --calc="A*0" -A CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif --outfile=protected_areas_canada_qc.tif
+gdal_rasterize -burn 100 -add -l protected_areas_canada_qc.shp protected_areas_canada_qc.tif
+gdal_calc.py --calc="A+B" -A cec/CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif -B protected_areas_canada_qc.tif --outfile=protected_areas_canada_qc.tif
