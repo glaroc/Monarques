@@ -10,67 +10,112 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## CREATING THE BASE LAYERS FROM CEC LAND COVER MAP
-```{r, eval=FALSE}
-library(rgrass7)
+#library(rgrass7)
 
-initGRASS('/usr/lib/grass74/',gisDbase = '/home/glaroc/Monarques/GRASS',location = 'CEC',mapset = 'PERMANENT',override = TRUE)
-
+#initGRASS('/usr/lib/grass74/',gisDbase = '/home/glaroc/Monarques/GRASS',location = 'CEC',mapset = 'PERMANENT',override = TRUE)
+```{r, eval=TRUE}
 library(rgrass7)
+library(sp)
+library(stringr)
+library(spatialEco)
+library(rgdal)
 initGRASS('/usr/lib/grass74/',gisDbase = '/home/ubuntu/data/GRASS',location = 'monarques',mapset = 'PERMANENT',override = TRUE)
 
+
+buffer=50000
+nrand=0.05
+use_sp()
+
+```
+
+
+```{r, eval=FALSE}
+
+
+##DEFINE THE LIMITS OF THE RANGE BASED ON MONARCHS AND MILKWEED DISTRIBUTION
+
+execGRASS('v.in.ogr',input="/home/ubuntu/data/Monarques/danaus_asclepias_complete_cec.shp",output='range', flags=c('overwrite'))
+execGRASS('v.buffer',input="range", distance=buffer, output="range_buffer", flags=c('overwrite'))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_master_sample_poly_cec.shp', output='gtrs_10', flags=c('overwrite'))
+execGRASS('v.clip',input='gtrs_10',clip='range_buffer',output='gtrs_range', flags=c('overwrite'))
+
 ##CREATION OF THE BASE LAND COVER LAYER WITH ROADS, RAILS AND TRANSMISSION LINES
-execGRASS('r.in.gdal',input = '/home/glaroc/Monarques/Cartes_GIS/CEC_land_cover/CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif',output = 'CEC', memory=10000)
+execGRASS('r.in.gdal',input = '/home/ubuntu/data/Monarques/CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif',output = 'CEC', memory=100000, flags=c('overwrite'))
 execGRASS('g.region',raster='CEC')
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/Cartes_GIS/Roads/canada_hwy.shp', output= 'Roads', flags=c('overwrite'))
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/Cartes_GIS/Rail/canada_rails_cec.shp', output= 'Rails', flags=c('overwrite'))
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/Cartes_GIS/transmission_lines_OSM_CEC.gpkg', output= 'Transmission', flags=c('overwrite'))
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/Cartes_GIS/protected_areas_canada_qc.shp', output= 'Protected', snap='1e-09', flags=c('overwrite'))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_hwy.shp', output= 'Roads', flags=c('overwrite'))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_rails_cec.shp', output= 'Rails', flags=c('overwrite'))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/transmission_lines_OSM_CEC.gpkg', output= 'Transmission', flags=c('overwrite'))
+
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/protected_areas_canada_qc.shp', output= 'Protected', snap=1e-09, flags=c('overwrite'))
 execGRASS('v.to.rast',input= 'Roads',output = 'Roads', use='val',value=20, memory=150000, flags=c('overwrite'))
 execGRASS('v.to.rast',input= 'Rails',output = 'Rails', use='val',value=21, memory=150000, flags=c('overwrite'))
 execGRASS('v.to.rast',input= 'Transmission',output = 'Transmission', use='val',value=22, memory=150000, flags=c('overwrite'))
 execGRASS('v.to.rast',input= 'Protected',output = 'Protected', use='val',value=100, memory=150000, flags=c('overwrite'))
-execGRASS('r.patch',input='Roads, Rails, Transmission, CEC',output='CEC2', flags=c('overwrite'))
+
+execGRASS('r.patch',input='Roads,Rails,Transmission,CEC',output='CEC2', flags=c('overwrite'))
 execGRASS('r.null',null=0,map='CEC2')
 execGRASS('r.null',null=0,map='Protected')
 execGRASS('r.mapcalc',expression='CEC_pa = CEC2+Protected', flags=c('overwrite'))
-execGRASS('r.out.gdal', input='CEC_pa',output='/home/ubuntu/data/Monarques/cec_pa_lines.tif', format='GTiff',createopt="COMPRESS=DEFLATE")
+```
+
+```{r, eval=FALSE}
+execGRASS('r.out.gdal', input='CEC_pa',output='/home/ubuntu/data/Monarques/cec_pa_lines.tif', format='GTiff',createopt="COMPRESS=DEFLATE", flags=c('overwrite'))
 ##LAND COVER SUITABLE FOR MONARCHS
 execGRASS('r.reclass', input = 'CEC_pa', output='CEC_suitable', rules='/home/ubuntu/data/Monarques/cec_reclass.txt', flags=c('overwrite'))
-##EXTRACT LAND COVERS FOR EACH GTRS ZONE
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_mastersample_in_range_poly_cec.shp', output='gtrs_10', flags=c('overwrite'))
-execGRASS('v.to.rast',input='gtrs_10', output='CEC_suitable', use='attr',attribute_column='GTRS_ID',memory=150000, flags=c('overwrite'))
-execGRASS('r.stats.zonal',base='gtrs_10', cover='CEC_suitable',method='sum',output='gtrs_suitable_zonal', flags=c('overwrite'))
-execGRASS('r.out.gdal',input='gtrs_suitable_zonal',output='/home/ubuntu/data/Monarques/gtrs_suitable_zonal.tif', format='GTiff',createopt="COMPRESS=DEFLATE")
-execGRASS('r.to.vec',input='gtrs_suitable_zonal', output='gtrs_suitable_zonal',type='area',column='suitable', flags=c('overwrite'))
-execGRASS('v.out.ogr',input='gtrs_suitable_zonal', type='area',output='/home/ubuntu/data/Monarques/gtrs_suitable_zonal.gpkg')
+
+
+##EXTRACT LAND COVERS FOR EACH GRTS ZONE
+execGRASS('v.to.rast',input='gtrs_range', output='gtrs_range', use='attr',attribute_column='GRTS_ID',memory=150000, flags=c('overwrite'))
+execGRASS('r.stats.zonal',base='gtrs_range', cover='CEC_suitable',method='sum',output='gtrs_suitable_zonal', flags=c('overwrite'))
+execGRASS('r.out.gdal',input='gtrs_suitable_zonal',output='/home/ubuntu/data/Monarques/gtrs_suitable_zonal.tif', format='GTiff',createopt="COMPRESS=DEFLATE", flags=c('overwrite'))
+execGRASS('r.to.vect',input='gtrs_suitable_zonal', output='gtrs_suitable_zonal',type='area',column='suitable', flags=c('overwrite'))
+
+execGRASS('v.out.ogr',input='gtrs_suitable_zonal',output='/home/ubuntu/data/Monarques/gtrs_suitable_zonal.gpkg',type='area', flags=c('overwrite'))
+
+execGRASS('v.db.addcolumn', map='gtrs_suitable_zonal',col="area double")
+execGRASS('v.to.db',map='gtrs_suitable_zonal',option='area',columns='area')
+```
+
+```{r, eval=FALSE}
+gtrs=readVECT('gtrs_suitable_zonal')
+rnd=ceiling(nrow(gtrs)*nrand)
+execGRASS('v.extract',input='gtrs_suitable_zonal',output='tmp',where='suitable>50000 AND area>99000000',flags=c('overwrite'))
+execGRASS('v.extract',input='tmp',output='selected_blocks',random=rnd,flags=c('overwrite'))
+execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/data/Monarques/selected_blocks.gpkg', flags=c('overwrite'))
+
 ```
 
 ### SELECTION OF GTRS SQUARES ZONES
 
-gtrs_suitable_zonal file is opened in QGIS and a random identifier is given to each polygon. A random 5% of grid blocks are choosent. 
+# Old approach
+#gtrs_suitable_zonal file is opened in QGIS and a random identifier is given to each polygon. A random 5% of grid blocks are choosen. 
+
+
 
 ### 30 M SELECTION
-```{r, eval=FALSE}
-library(rgrass7)
-library(stringr)
-initGRASS('/usr/lib/grass74/',gisDbase = '/home/ubuntu/data/GRASS',location = 'monarques',mapset = 'PERMANENT',override = TRUE)
-
-execGRASS('r.reclass',input='CEC_pa',output='CEC_5cats',rules='/home/ubuntu/data/Monarques/cec_reclass_5cats.txt',c('overwrite'))
-fids=execGRASS('v.db.select',map='selected_blocks',columns='fid',flags=c("c","v"))
+```{r, eval=TRUE}
+#execGRASS('v.db.addcolumn',map='selected_blocks',columns="grts_id int")
+execGRASS('v.what.vect',map='selected_blocks',query_map='gtrs_10',query_column='grts_id',column='grts_id')
+execGRASS('r.reclass',input='CEC_pa',output='CEC_6cats',rules='/home/ubuntu/data/Monarques/Monarques-repo/cec_reclass_6cats.txt',c('overwrite'))
+fids=execGRASS('v.db.select',map='selected_blocks',columns='grts_id',flags=c("c","v"))
 fids=attr(fids,"resOut")
 ii=0
 for (i in fids) {
-  execGRASS('v.extract',input='selected_blocks',output='block_temp',where=paste0("fid=",i),flags = c('overwrite'))
+  execGRASS('v.extract',input='selected_blocks',output='block_temp',where=paste0("grts_id=",i),flags = c('overwrite'))
   execGRASS('g.region', vector='block_temp')
   execGRASS('r.mask',vector='block_temp', flags = c("overwrite"))
-  execGRASS('r.to.vect',input='CEC_5cats', output='temp', type='point',flags = c('overwrite'))
-  for (j in (1:5)) {
+  execGRASS('r.to.vect',input='CEC_6cats', output='temp', type='point',flags = c('overwrite'))
+  for (j in (1:6)) {
     execGRASS('v.extract',input='temp', output='temp2', where=paste0("value=",j),flags = c('overwrite'))
-    tt=execGRASS('v.info',map='temp2',flags=c('t'))
-    npoints=as.numeric(str_replace(attr(tt,"resOut")[2],'points=',''))
+    pts <- readVECT('temp2')
+    npoints <- nrow(pts)
     if(npoints > 1){
-      npoints=min(npoints-1,20)
-      execGRASS('v.extract',input='temp2', output='temp3', random=npoints, flags = c('overwrite'))
+      npoints <- min(npoints-1,20)
+    }
+    if(npoints > 1){
+      pts2<-pp.subsample(pts,n=npoints,gradient=0.2)
+      writeOGR(pts2, "/home/ubuntu/data/Monarques/", "pts_temp", driver = "ESRI Shapefile", overwrite_layer=TRUE) 
+      execGRASS('v.in.ogr',input="/home/ubuntu/data/Monarques/pts_temp.shp",output='temp3', flags=c('overwrite'))
       if(i==fids[1] && j==1){
         execGRASS('v.patch',input='temp3', output='all30',flags = c('overwrite'))
       }else{
@@ -82,10 +127,17 @@ for (i in fids) {
   print(ii/length(fids))
 }
 
-#This doesn't quite work 
-#execGRASS('r.mask',vector='block_temp', flags = c("overwrite"))
-#execGRASS('v.db.addtable',map='all30')
-#execGRASS('v.what.rast',map='all30',raster='CEC_pa',column='cover_type')
+```
+
+```{r, eval=FALSE}
+#This doesn't quite work. Used approach below instead. 
+execGRASS('g.region',raster='CEC_pa')
+#execGRASS('r.mask', flags = c("r","quiet"))
+execGRASS('v.db.droptable',map='all30',flags=c('f'))
+execGRASS('v.db.addtable',map='all30',columns="cover_type int")
+execGRASS('v.what.rast',map='all30',raster='CEC_pa',column='cover_type')
+execGRASS('v.db.addcolumn',map='all30',columns="grts_id int")
+execGRASS('v.what.vect',map='all30',query_map='gtrs_10',query_column='grts_id',column='grts_id')
 execGRASS('v.out.ogr', input='all30', type='point', output='/home/ubuntu/data/Monarques/all30.gpkg',flags=c('overwrite'))
 
 ```
@@ -97,15 +149,15 @@ Point sampling tool is used in QGIS to combine the province shapefile, the CEC_p
 Then, to generate point ID
 
 ```{r, eval=FALSE}
-
-execGRASS('v.out.ogr', input='all30', type='point', output='/home/ubuntu/data/Monarques/all30_v2.csv',format='CSV',flags=c('overwrite'))
-all30<-read.csv('/home/ubuntu/data/Monarques/all30_v2.csv')
-for (i in unique(all30$block_id)) {
-  all30[all30$block_id==i,'point_id'] <- seq(1,sum(all30$block_id==i))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
+execGRASS('v.out.ogr', input='all30_with_cats', type='point', output='/home/ubuntu/data/Monarques/all30_with_cats.csv',format='CSV',flags=c('overwrite'))
+all30<-read.csv('/home/ubuntu/data/Monarques/all30_with_cats.csv')
+for (i in unique(all30$grts_id)) {
+  all30[all30$grts_id==i,'point_id'] <- seq(1,sum(all30$grts_id==i))
 }
-all30$point_id_full=paste0('CA-',str_pad(all30$block_id,4,side='left',pad=0),'-',all30$point_id)
+all30$point_id_full=paste0('CA-',str_pad(all30$grts_id,4,side='left',pad=0),'-',all30$point_id)
 
-write.csv(all30,'all30_with_ids.csv')
+write.csv(all30,'/home/ubuntu/data/Monarques/all30_with_ids.csv')
 ```
 
 
