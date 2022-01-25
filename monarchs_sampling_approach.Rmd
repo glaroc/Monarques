@@ -93,7 +93,7 @@ execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/
 
 
 ### 30 M SELECTION
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 #execGRASS('v.db.addcolumn',map='selected_blocks',columns="grts_id int")
 execGRASS('v.what.vect',map='selected_blocks',query_map='gtrs_10',query_column='grts_id',column='grts_id')
 execGRASS('r.reclass',input='CEC_pa',output='CEC_6cats',rules='/home/ubuntu/data/Monarques/Monarques-repo/cec_reclass_6cats.txt',c('overwrite'))
@@ -107,19 +107,23 @@ for (i in fids) {
   execGRASS('r.to.vect',input='CEC_6cats', output='temp', type='point',flags = c('overwrite'))
   for (j in (1:6)) {
     execGRASS('v.extract',input='temp', output='temp2', where=paste0("value=",j),flags = c('overwrite'))
-    pts <- readVECT('temp2')
-    npoints <- nrow(pts)
-    if(npoints > 1){
-      npoints <- min(npoints-1,20)
-    }
-    if(npoints > 1){
-      pts2<-pp.subsample(pts,n=npoints,gradient=0.2)
-      writeOGR(pts2, "/home/ubuntu/data/Monarques/", "pts_temp", driver = "ESRI Shapefile", overwrite_layer=TRUE) 
-      execGRASS('v.in.ogr',input="/home/ubuntu/data/Monarques/pts_temp.shp",output='temp3', flags=c('overwrite'))
-      if(i==fids[1] && j==1){
-        execGRASS('v.patch',input='temp3', output='all30',flags = c('overwrite'))
-      }else{
-        execGRASS('v.patch',input='temp3', output='all30',flags = c('a','overwrite'))
+    tt=execGRASS('v.info',map='temp2',flags=c('t'))
+    npoints=as.numeric(str_replace(attr(tt,"resOut")[2],'points=',''))
+    if(npoints>1){
+      pts <- readVECT('temp2',type='point')
+      nsamples <- min(npoints-1,20)
+      if(nsamples > 1){
+        if(npoints != 20){
+          pts2 <- subsample.distance(pts, size=nsamples, d=300)
+        }else{
+          pts2 <- pts
+        }
+        writeVECT(pts2, 'temp3',v.in.ogr_flags=c('o','overwrite','t')) 
+        if(i==fids[1] && j==1){
+          execGRASS('v.patch',input='temp3', output='all30',flags = c('overwrite'))
+        }else{
+          execGRASS('v.patch',input='temp3', output='all30',flags = c('a','overwrite'))
+        }
       }
     }
   }
@@ -133,11 +137,11 @@ for (i in fids) {
 #This doesn't quite work. Used approach below instead. 
 execGRASS('g.region',raster='CEC_pa')
 #execGRASS('r.mask', flags = c("r","quiet"))
-execGRASS('v.db.droptable',map='all30',flags=c('f'))
-execGRASS('v.db.addtable',map='all30',columns="cover_type int")
-execGRASS('v.what.rast',map='all30',raster='CEC_pa',column='cover_type')
-execGRASS('v.db.addcolumn',map='all30',columns="grts_id int")
-execGRASS('v.what.vect',map='all30',query_map='gtrs_10',query_column='grts_id',column='grts_id')
+#execGRASS('v.db.droptable',map='all30',flags=c('f'))
+#execGRASS('v.db.addtable',map='all30',columns="cover_type int")
+#execGRASS('v.what.rast',map='all30',raster='CEC_pa',column='cover_type')
+#execGRASS('v.db.addcolumn',map='all30',columns="grts_id int")
+#execGRASS('v.what.vect',map='all30',query_map='gtrs_10',query_column='grts_id',column='grts_id')
 execGRASS('v.out.ogr', input='all30', type='point', output='/home/ubuntu/data/Monarques/all30.gpkg',flags=c('overwrite'))
 
 ```
@@ -148,8 +152,8 @@ Point sampling tool is used in QGIS to combine the province shapefile, the CEC_p
 
 Then, to generate point ID
 
-```{r, eval=FALSE}
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
+```{r, eval=TRUE}
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_all_cats2.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
 execGRASS('v.out.ogr', input='all30_with_cats', type='point', output='/home/ubuntu/data/Monarques/all30_with_cats.csv',format='CSV',flags=c('overwrite'))
 all30<-read.csv('/home/ubuntu/data/Monarques/all30_with_cats.csv')
 for (i in unique(all30$grts_id)) {
