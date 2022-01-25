@@ -1,0 +1,37 @@
+Description|Sector|CEC_cover|Sector_long
+No Data|NA|0|NA
+Temperate or sub-polar needleleaf forest|NA|1|NA
+Sub-polar taiga needleleaf forest|NA|2|NA
+Tropical or sub-tropical broadleaf evergreen forest|NA|3|NA
+Tropical or sub-tropical broadleaf deciduous forest|NA|4|NA
+Temperate or sub-polar broadleaf deciduous forest|NA|5|NA
+Mixed forest|NA|6|NA
+Tropical or sub-tropical shrubland|UGS|7|Grassland or shrubland
+Temperate or sub-polar shrubland|UGS|8|Grassland or shrubland
+Tropical or sub-tropical grassland|UGS|9|Grassland or shrubland
+Temperate or sub-polar grassland|UGS|10|Grassland or shrubland
+Sub-polar or polar shrubland-lichen-moss|UGS|11|Grassland or shrubland
+Sub-polar or polar grassland-lichen-moss|UGS|12|Grassland or shrubland
+Sub-polar or polar barren-lichen-moss|UGS|13|Grassland or shrubland
+Wetland|WET|14|Wetland
+Cropland|AGC|15|Cropland
+Barren land|NA|16|NA
+Developed|DEV|17|Developed
+Water|NA|18|NA
+Snow and ice|NA|19|NA
+Tropical or sub-tropical shrubland (Protected)|PGS|107|Protected grassland
+Temperate or sub-polar shrubland (Protected)|PGS|108|Protected grassland
+Tropical or sub-tropical grassland (Protected)|PGS|109|Protected grassland
+Temperate or sub-polar grassland (Protected)|PGS|110|Protected grassland
+Sub-polar or polar shrubland-lichen-moss (Protected)|PGS|111|Protected grassland
+Sub-polar or polar grassland-lichen-moss (Protected)|PGS|112|Protected grassland
+Sub-polar or polar barren-lichen-moss (Protected)|PGS|113|Protected grassland
+Wetland (Protected)|PWL|114|Protected wetland
+Cropland (Protected)|PAG|115|Protected cropland
+Roads|ROW|20|Right-of-way
+Railroads|ROW|21|Right-of-way
+Transmission lines|ROW|22|Right-of-way
+Roads|ROW|120|Right-of-way
+Railroads|ROW|121|Right-of-way
+Transmission lines|ROW|122|Right-of-way
+Developed|DEV|117|Developed

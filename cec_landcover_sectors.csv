@@ -1,0 +1,33 @@
+lc_code,Description,Sector,CEC_cover,Suitable,Cat
+0,No Data,NA,0,0,0
+2,Temperate or sub-polar needleleaf forest,NA,1,0,0
+4,Sub-polar taiga needleleaf forest,NA,2,0,0
+6,Tropical or sub-tropical broadleaf evergreen forest,NA,3,0,0
+8,Tropical or sub-tropical broadleaf deciduous forest,NA,4,0,0
+10,Temperate or sub-polar broadleaf deciduous forest,NA,5,0,0
+12,Mixed forest,NA,6,0,0
+14,Tropical or sub-tropical shrubland,UGS,7,1,1
+16,Temperate or sub-polar shrubland,UGS,8,1,1
+18,Tropical or sub-tropical grassland,UGS,9,1,1
+20,Temperate or sub-polar grassland,UGS,10,1,1
+22,Sub-polar or polar shrubland-lichen-moss,UGS,11,1,1
+24,Sub-polar or polar grassland-lichen-moss,UGS,12,1,1
+26,Sub-polar or polar barren-lichen-moss,UGS,13,1,1
+28,Wetland,UGS,14,1,1
+30,Cropland,AGC,15,1,3
+32,Barren land,NA,16,0,0
+34,Developed (Not Urban),DEV,17,1,5
+36,Water,NA,18,0,0
+38,Snow and ice,NA,19,0,0
+64,Tropical or sub-tropical shrubland (Protected),PGS,107,1,2
+66,Temperate or sub-polar shrubland (Protected),PGS,108,1,2
+68,Tropical or sub-tropical grassland (Protected),PGS,109,1,2
+70,Temperate or sub-polar grassland (Protected),PGS,110,1,2
+72,Sub-polar or polar shrubland-lichen-moss (Protected),PGS,111,1,2
+74,Sub-polar or polar grassland-lichen-moss (Protected),PGS,112,1,2
+78,Wetland (Protected),PGS,114,1,2
+80,Cropland (Protected),AGC,115,1,3
+100,Railroads,ROW,20,1,4
+110,Roads,ROW,21,1,4
+,Transmission lines,ROW,22,1,4
+120,Urban Areas,DEV,17,1,5
