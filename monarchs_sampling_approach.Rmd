@@ -37,6 +37,7 @@ use_sp()
 execGRASS('v.in.ogr',input="/home/ubuntu/data/Monarques/danaus_asclepias_complete_cec.shp",output='range', flags=c('overwrite'))
 execGRASS('v.buffer',input="range", distance=buffer, output="range_buffer", flags=c('overwrite'))
 execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_master_sample_poly_cec.shp', output='gtrs_10', flags=c('overwrite'))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_mastersample_cec.shp', output='gtrs_pts_10', flags=c('overwrite'))
 execGRASS('v.clip',input='gtrs_10',clip='range_buffer',output='gtrs_range', flags=c('overwrite'))
 
 ##CREATION OF THE BASE LAND COVER LAYER WITH ROADS, RAILS AND TRANSMISSION LINES
@@ -81,6 +82,8 @@ gtrs=readVECT('gtrs_suitable_zonal')
 rnd=ceiling(nrow(gtrs)*nrand)
 execGRASS('v.extract',input='gtrs_suitable_zonal',output='tmp',where='suitable>50000 AND area>99000000',flags=c('overwrite'))
 execGRASS('v.extract',input='tmp',output='selected_blocks',random=rnd,flags=c('overwrite'))
+execGRASS('v.db.addcolumn',map='selected_blocks',columns="grts_id int")
+execGRASS('v.what.vect',map='selected_blocks',query_map='gtrs_pts_10',query_column='grts_id',column='grts_id')
 execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/data/Monarques/selected_blocks.gpkg', flags=c('overwrite'))
 
 ```
@@ -93,9 +96,7 @@ execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/
 
 
 ### 30 M SELECTION
-```{r, eval=FALSE}
-#execGRASS('v.db.addcolumn',map='selected_blocks',columns="grts_id int")
-execGRASS('v.what.vect',map='selected_blocks',query_map='gtrs_10',query_column='grts_id',column='grts_id')
+```{r, eval=TRUE}
 execGRASS('r.reclass',input='CEC_pa',output='CEC_6cats',rules='/home/ubuntu/data/Monarques/Monarques-repo/cec_reclass_6cats.txt',c('overwrite'))
 fids=execGRASS('v.db.select',map='selected_blocks',columns='grts_id',flags=c("c","v"))
 fids=attr(fids,"resOut")
@@ -133,7 +134,7 @@ for (i in fids) {
 
 ```
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 #This doesn't quite work. Used approach below instead. 
 execGRASS('g.region',raster='CEC_pa')
 #execGRASS('r.mask', flags = c("r","quiet"))
@@ -152,7 +153,7 @@ Point sampling tool is used in QGIS to combine the province shapefile, the CEC_p
 
 Then, to generate point ID
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_all_cats2.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
 execGRASS('v.out.ogr', input='all30_with_cats', type='point', output='/home/ubuntu/data/Monarques/all30_with_cats.csv',format='CSV',flags=c('overwrite'))
 all30<-read.csv('/home/ubuntu/data/Monarques/all30_with_cats.csv')
