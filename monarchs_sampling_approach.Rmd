@@ -156,7 +156,7 @@ For Lng in field calculator: x(transform($geometry, layer_property(@layer, 'crs'
 Then, to generate point ID
 
 ```{r, eval=TRUE}
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_all_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
 execGRASS('v.out.ogr', input='all30_with_cats', type='point', output='/home/ubuntu/data/Monarques/all30_with_cats.csv',format='CSV',flags=c('overwrite'))
 all30<-read.csv('/home/ubuntu/data/Monarques/all30_with_cats.csv')
 for (i in unique(all30$grts_id)) {
