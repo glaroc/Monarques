@@ -96,7 +96,7 @@ execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/
 
 
 ### 30 M SELECTION
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 execGRASS('r.reclass',input='CEC_pa',output='CEC_6cats',rules='/home/ubuntu/data/Monarques/Monarques-repo/cec_reclass_6cats.txt',c('overwrite'))
 fids=execGRASS('v.db.select',map='selected_blocks',columns='grts_id',flags=c("c","v"))
 fids=attr(fids,"resOut")
@@ -134,7 +134,7 @@ for (i in fids) {
 
 ```
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 #This doesn't quite work. Used approach below instead. 
 execGRASS('g.region',raster='CEC_pa')
 #execGRASS('r.mask', flags = c("r","quiet"))
@@ -149,12 +149,14 @@ execGRASS('v.out.ogr', input='all30', type='point', output='/home/ubuntu/data/Mo
 
 ### GENERATION OF FINAL MAP
 
-Point sampling tool is used in QGIS to combine the province shapefile, the CEC_pa land cover and the GRTS block ids to the attribute table. 
+Point sampling tool is used in QGIS to combine the CEC_pa land cover and the GRTS block ids to the attribute table. Note that to assign the province, the Join attributes by Nearest tool in Processing is used since some points fall off the provinces shapefile. 
+
+For Lng in field calculator: x(transform($geometry, layer_property(@layer, 'crs'),'EPSG:4326'))
 
 Then, to generate point ID
 
-```{r, eval=FALSE}
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_all_cats2.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
+```{r, eval=TRUE}
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
 execGRASS('v.out.ogr', input='all30_with_cats', type='point', output='/home/ubuntu/data/Monarques/all30_with_cats.csv',format='CSV',flags=c('overwrite'))
 all30<-read.csv('/home/ubuntu/data/Monarques/all30_with_cats.csv')
 for (i in unique(all30$grts_id)) {
