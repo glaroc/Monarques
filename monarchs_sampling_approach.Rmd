@@ -29,17 +29,20 @@ use_sp()
 ```
 
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 
 
 ##DEFINE THE LIMITS OF THE RANGE BASED ON MONARCHS AND MILKWEED DISTRIBUTION
 
-execGRASS('v.in.ogr',input="/home/ubuntu/data/Monarques/danaus_asclepias_complete_cec.shp",output='range', flags=c('overwrite'))
-execGRASS('v.buffer',input="range", distance=buffer, output="range_buffer", flags=c('overwrite'))
+execGRASS('v.in.ogr',input="/home/ubuntu/data/Monarques/Danaus_asclepias_intersected_range_only_cec.shp",output='range', flags=c('overwrite'))
+#execGRASS('v.buffer',input="range", distance=buffer, output="range_buffer", flags=c('overwrite'))
 execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_master_sample_poly_cec.shp', output='gtrs_10', flags=c('overwrite'))
 execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/canada_mastersample_cec.shp', output='gtrs_pts_10', flags=c('overwrite'))
-execGRASS('v.clip',input='gtrs_10',clip='range_buffer',output='gtrs_range', flags=c('overwrite'))
+execGRASS('v.clip',input='gtrs_10',clip='range',output='gtrs_range', flags=c('overwrite'))
 
+````
+
+```{r, eval=FALSE}
 ##CREATION OF THE BASE LAND COVER LAYER WITH ROADS, RAILS AND TRANSMISSION LINES
 execGRASS('r.in.gdal',input = '/home/ubuntu/data/Monarques/CAN_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif',output = 'CEC', memory=100000, flags=c('overwrite'))
 execGRASS('g.region',raster='CEC')
@@ -59,7 +62,7 @@ execGRASS('r.null',null=0,map='Protected')
 execGRASS('r.mapcalc',expression='CEC_pa = CEC2+Protected', flags=c('overwrite'))
 ```
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 execGRASS('r.out.gdal', input='CEC_pa',output='/home/ubuntu/data/Monarques/cec_pa_lines.tif', format='GTiff',createopt="COMPRESS=DEFLATE", flags=c('overwrite'))
 ##LAND COVER SUITABLE FOR MONARCHS
 execGRASS('r.reclass', input = 'CEC_pa', output='CEC_suitable', rules='/home/ubuntu/data/Monarques/cec_reclass.txt', flags=c('overwrite'))
@@ -77,7 +80,9 @@ execGRASS('v.db.addcolumn', map='gtrs_suitable_zonal',col="area double")
 execGRASS('v.to.db',map='gtrs_suitable_zonal',option='area',columns='area')
 ```
 
-```{r, eval=FALSE}
+
+### SELECTION OF GTRS SQUARES ZONES
+```{r, eval=TRUE}
 gtrs=readVECT('gtrs_suitable_zonal')
 rnd=ceiling(nrow(gtrs)*nrand)
 execGRASS('v.extract',input='gtrs_suitable_zonal',output='tmp',where='suitable>50000 AND area>99000000',flags=c('overwrite'))
@@ -88,7 +93,7 @@ execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/
 
 ```
 
-### SELECTION OF GTRS SQUARES ZONES
+
 
 # Old approach
 #gtrs_suitable_zonal file is opened in QGIS and a random identifier is given to each polygon. A random 5% of grid blocks are choosen. 
@@ -149,13 +154,13 @@ execGRASS('v.out.ogr', input='all30', type='point', output='/home/ubuntu/data/Mo
 
 ### GENERATION OF FINAL MAP
 
-Point sampling tool is used in QGIS to combine the CEC_pa land cover and the GRTS block ids to the attribute table. Note that to assign the province, the Join attributes by Nearest tool in Processing is used since some points fall off the provinces shapefile. 
+#Point sampling tool is used in QGIS to combine the CEC_pa land cover and the GRTS block ids to the attribute table. Note that to assign the province, the Join attributes by Nearest tool in Processing is used since some points fall off the provinces shapefile. 
 
-For Lng in field calculator: x(transform($geometry, layer_property(@layer, 'crs'),'EPSG:4326'))
+#For Lng in field calculator: x(transform($geometry, layer_property(@layer, 'crs'),'EPSG:4326'))
 
-Then, to generate point ID
+#Then, to generate point ID
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/all30_with_all_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
 execGRASS('v.out.ogr', input='all30_with_cats', type='point', output='/home/ubuntu/data/Monarques/all30_with_cats.csv',format='CSV',flags=c('overwrite'))
 all30<-read.csv('/home/ubuntu/data/Monarques/all30_with_cats.csv')
