@@ -99,11 +99,11 @@ grts=readVECT('suitable_blocks')
 set.seed(2022)
 rnd=ceiling(nrow(grts)*nrand)
 randval=grts$rand[sort(grts$rand,index.return=TRUE)$ix[rnd]]
-where=paste0('grts_id=191585 OR (suitable>50000 AND rand<=',randval,')')
+where=paste0('grts_id=191585 OR grts_id=244428 OR (suitable>50000 AND rand<=',randval,')')
 execGRASS('v.extract',input='suitable_blocks',output='selected_blocks',where=where,flags=c('overwrite'))
 #execGRASS('v.extract',input='tmp',output='selected_blocks_10',random=rnd,flags=c('overwrite'))
-execGRASS('v.out.ogr',input='suitable_blocks', type='area',output='/home/ubuntu/data/Monarques/suitable_blocks_2023.gpkg', flags=c('overwrite'))
-execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/data/Monarques/selected_blocks_2023.gpkg', flags=c('overwrite'))
+#execGRASS('v.out.ogr',input='suitable_blocks', type='area',output='/home/ubuntu/data/Monarques/suitable_blocks_2023.gpkg', flags=c('overwrite'))
+execGRASS('v.out.ogr',input='selected_blocks', type='area',output='/home/ubuntu/data/Monarques/selected_blocks_2023c.gpkg', flags=c('overwrite'))
 
 ```
 
@@ -153,7 +153,7 @@ for (i in fids) {
 
 ```
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 #This doesn't quite work. Used approach below instead. 
 execGRASS('g.region',raster='CEC_pa')
 #execGRASS('r.mask', flags = c("r","quiet"))
@@ -162,7 +162,7 @@ execGRASS('g.region',raster='CEC_pa')
 #execGRASS('v.what.rast',map='all30',raster='CEC_pa',column='cover_type')
 #execGRASS('v.db.addcolumn',map='all30',columns="grts_id int")
 #execGRASS('v.what.vect',map='all30',query_map='gtrs_10',query_column='grts_id',column='grts_id')
-execGRASS('v.out.ogr', input='all30', type='point', output='/home/ubuntu/data/Monarques/all30_2023.gpkg',flags=c('overwrite'))
+execGRASS('v.out.ogr', input='all30', type='point', output='/home/ubuntu/data/Monarques/all30_2023c.gpkg',flags=c('overwrite'))
 
 ```
 
@@ -176,7 +176,7 @@ For Lng in field calculator: x(transform($geometry, layer_property(@layer, 'crs'
 Then, to generate point ID
 
 ```{r, eval=TRUE}
-execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/Monarques-repo/data/all30_2023_with_all_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
+execGRASS('v.in.ogr',input='/home/ubuntu/data/Monarques/Monarques-repo/data/all30_2023c_with_all_cats.gpkg', output= 'all30_with_cats', flags=c('overwrite','o'))
 execGRASS('v.out.ogr', input='all30_with_cats', type='point', output='/home/ubuntu/data/Monarques/Monarques-repo/data/all30_with_cats.csv',format='CSV',flags=c('overwrite'))
 all30<-read.csv('/home/ubuntu/data/Monarques/Monarques-repo/data/all30_with_cats.csv')
 for (i in unique(all30$grts_id)) {
@@ -184,7 +184,7 @@ for (i in unique(all30$grts_id)) {
 }
 all30$point_id_full=paste0('CA-',str_pad(all30$grts_id,4,side='left',pad=0),'-',all30$point_id)
 
-write.csv(all30,'/home/ubuntu/data/Monarques/Monarques-repo/data/all30_2023_with_ids.csv')
+write.csv(all30,'/home/ubuntu/data/Monarques/Monarques-repo/data/all30_2023c_with_ids.csv')
 ```
 
 
