@@ -1,6 +1,14 @@
 import { useEffect, useState, useRef, useCallback, memo } from "react";
 import "../../styles.css";
-import { Map, Popup, Layer, Source, useMap } from "react-map-gl";
+import {
+  Map,
+  Popup,
+  Layer,
+  Source,
+  useMap,
+  NavigationControl,
+  useControl,
+} from "react-map-gl";
 import maplibregl, { setWorkerCount } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Protocol } from "pmtiles";
@@ -83,6 +91,35 @@ const MMXMap = (props) => {
       "line-color": "#fff",
     },
   };
+
+  class MapLibreLegendControl {
+    onAdd(map) {
+      this._map = map;
+      this._container = document.createElement("div");
+      this._container.className =
+        "maplibregl-ctrl maplibregl-ctrl-group legend-control";
+      this._container.innerHTML = `<div style="text-align: left;padding: 20px; background: white; border-radius: 4px; font-family: sans-serif; font-size: 12px; line-height: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          <h4 style="margin: 0 0 5px;">Land cover categories</h4>
+              ${Object.entries(categories)
+                .map(
+                  ([name, color]) =>
+                    `<div><span style="text-align: left; background-color: ${color}; display: inline-block; width: 12px; height: 12px; margin-right: 5px; border-radius: 50%;"></span>${name}</div>`,
+                )
+                .join("")}
+        </div>`;
+
+      return this._container;
+    }
+    onRemove() {
+      this._container.parentNode.removeChild(this._container);
+      this._map = undefined;
+    }
+  }
+
+  function LegendControl(props) {
+    useControl(() => new MapLibreLegendControl(), { position: "top-left" });
+    return null;
+  }
 
   useEffect(() => {
     let protocol = new Protocol();
@@ -183,6 +220,8 @@ const MMXMap = (props) => {
         }}
         mapLib={maplibregl}
       >
+        <NavigationControl position="bottom-left" />
+        <LegendControl />
         <PMTilesMMX />
         {showPopup && <> {popup} </>}
       </Map>
