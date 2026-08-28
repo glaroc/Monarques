@@ -1,0 +1,6 @@
+--2025-11-03 14:33:40--  https://montreal-prod.storage.googleapis.com/resources/64e28fe6-ef37-437a-972d-d1d3f1f7d891/arbres-publics.csv?X-Goog-Algorithm=GOOG4-RSA-SHA256
+Resolving montreal-prod.storage.googleapis.com (montreal-prod.storage.googleapis.com)... 142.250.69.155, 142.250.69.91, 142.250.69.123, ...
+Connecting to montreal-prod.storage.googleapis.com (montreal-prod.storage.googleapis.com)|142.250.69.155|:443... connected.
+HTTP request sent, awaiting response... 400 Bad Request
+2025-11-03 14:33:41 ERROR 400: Bad Request.
+

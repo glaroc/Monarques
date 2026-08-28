@@ -1,0 +1,17 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.MuiDrawer-root > .MuiPaper-root {
+  overflow: visible;
+  background-color: #333;
+  z-index: 999999;
+  height: calc(90% - 56px);
+  max-height: '90vh';
+}
+
+.PrivateSwipeArea-root {
+  background-color: #333;
+  border-radius: 8px 8px 0 8px;
+}

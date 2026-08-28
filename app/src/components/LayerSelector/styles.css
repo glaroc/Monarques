@@ -1,0 +1,78 @@
+.selector-frame {
+  background-color: transparent;
+  display: flex;
+  width: 100%;
+  height: fit-content;
+  justify-content: left;
+  align-items: center;
+  pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+  cursor: default;
+}
+
+.selector-container {
+  background-color: transparent;
+  display: flex;
+  width: fit-content;
+  height: fit-content;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  min-height: 150px;
+  cursor: default;
+}
+
+.layers-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  gap: 16px;
+  overflow: hidden;
+  transition: width 1.5s;
+}
+
+.selector-btn {
+  pointer-events: all;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: white;
+  padding: 5px;
+  min-width: 50px;
+  min-height: 50px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  cursor: pointer;
+}
+
+.layer-item {
+  pointer-events: all;
+  display: flex;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+  background-color: white;
+  width: fit-content;
+  height: fit-content;
+  overflow: hidden;
+  padding: 2px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.collapsible {
+  width: 200px; /* Set the initial width */
+  overflow: hidden;
+  transition: width 1s; /* Add a transition for a smooth animation */
+}
+
+.collapsed {
+  width: 0; /* Reduce the width to 0 when collapsed */
+}
