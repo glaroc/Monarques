@@ -27,6 +27,18 @@ const MMXMap = (props) => {
   const [filter, setFilter] = useState(["all"]);
   const mapRef = useRef();
 
+  const categories = {
+    "Grassland or shrubland": "#0f9973",
+    Wetland: "#1d7cb4",
+    Developed: "#e459fc",
+    "Right-of-way": "#8718b4",
+    Cropland: "#b95b00",
+    "Protected wetland": "#9bd9ff",
+    "Protected cropland": "#fcc101",
+    "Protected grassland": "#0aff81",
+    Others: "#ccc",
+  };
+
   const pointsLayer = {
     id: "points",
     source: "points",
@@ -34,9 +46,14 @@ const MMXMap = (props) => {
     type: "circle",
     filter: filter,
     paint: {
-      "circle-color": "#33aaff",
-      "circle-radius": 3,
-      "circle-opacity": 0.7,
+      "circle-color": [
+        "match",
+        ["get", "cec_landcover_sector_long"],
+        ...Object.entries(categories).flatMap(([name, color]) => [name, color]),
+        "#ccc",
+      ],
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 4, 14, 8],
+      "circle-opacity": 1,
       "circle-stroke-opacity": 0.7,
       "circle-stroke-width": 1,
       "circle-stroke-color": "#333333",
@@ -50,8 +67,20 @@ const MMXMap = (props) => {
     type: "fill",
     paint: {
       "fill-outline-color": "#fff",
-      "fill-opacity": 0.3,
-      "fill-color": "#33aaff",
+      "fill-opacity": 0.1,
+      "fill-color": "#fff",
+    },
+  };
+
+  const blocksOutlineLayer = {
+    id: "blocksLine",
+    source: "blocks",
+    "source-layer": "selected_blocks",
+    type: "line",
+    paint: {
+      "line-width": 3,
+      "line-opacity": 0.8,
+      "line-color": "#fff",
     },
   };
 
@@ -67,18 +96,19 @@ const MMXMap = (props) => {
   const PMTilesMMX = () => (
     <>
       <Source
-        id="points"
-        type="vector"
-        url={`pmtiles://https://object-arbutus.alliancecan.ca/09f4ffc6879c42029e6126b269cf6560:monarques/pmtiles/final_points.pmtiles`}
-      >
-        <Layer {...pointsLayer} />
-      </Source>
-      <Source
         id="blocks"
         type="vector"
         url={`pmtiles://https://object-arbutus.alliancecan.ca/09f4ffc6879c42029e6126b269cf6560:monarques/pmtiles/selected_blocks.pmtiles`}
       >
         <Layer {...blocksLayer} />
+        <Layer {...blocksOutlineLayer} />
+      </Source>
+      <Source
+        id="points"
+        type="vector"
+        url={`pmtiles://https://object-arbutus.alliancecan.ca/09f4ffc6879c42029e6126b269cf6560:monarques/pmtiles/final_points.pmtiles`}
+      >
+        <Layer {...pointsLayer} />
       </Source>
     </>
   );
