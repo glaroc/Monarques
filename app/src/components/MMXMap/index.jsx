@@ -16,6 +16,8 @@ import { Protocol } from "pmtiles";
 import randomcolor from "randomcolor";
 import chroma from "chroma-js";
 import _ from "lodash";
+import { Typography } from "@mui/material";
+import "./style.css";
 
 const MMXMap = (props) => {
   const { baseLayer, lang, t } = props;
@@ -161,42 +163,63 @@ const MMXMap = (props) => {
           latitude: 45,
           zoom: 4,
         }}
+        interactiveLayerIds={["points"]}
         onMoveEnd={() => {}}
         onLoad={() => {
           setMapLoaded(true);
-          mapRef.current.on("mouseenter", "points", () => {
-            if (mapRef.current.getZoom() > 15) {
-              mapRef.current.getCanvas().style.cursor = "pointer";
-            }
-          });
           mapRef.current.on("mouseleave", "points", () => {
             mapRef.current.getCanvas().style.cursor = "";
           });
         }}
+        onMouseEnter={(e) => {
+          if (mapRef.current.getZoom() > 10) {
+            mapRef.current.getCanvas().style.cursor = "pointer";
+          }
+        }}
+        onMouseLeave={(e) => {
+          mapRef.current.getCanvas().style.cursor = "";
+        }}
         onClick={(e) => {
-          if (mapRef.current.getZoom() > 14) {
-            const feat = mapRef.current.queryRenderedFeatures(e.point);
-            const popupText = feat.map((f) => `Popup`);
+          if (mapRef.current.getZoom() > 10) {
+            const feat = mapRef.current
+              .queryRenderedFeatures(e.point)
+              .filter((f) => ["points"].includes(f.layer.id));
             if (feat.length === 0) {
               setShowPopup(false);
             } else {
               setShowPopup(true);
+              setPopup(
+                <Popup
+                  latitude={e.lngLat.lat}
+                  longitude={e.lngLat.lng}
+                  closeOnClick={false}
+                  onClose={() => setShowPopup(false)}
+                  closeButton={true}
+                >
+                  <div class="popup-content">
+                    <Typography variant="h3" class="popup-title">
+                      {feat[0].properties.point_id_full}
+                    </Typography>
+                    <Typography variant="h5">Latitude</Typography>
+                    <Typography class="popup-item">
+                      {feat[0].properties.latitude}
+                    </Typography>
+                    <Typography variant="h5">Longitude</Typography>
+                    <Typography class="popup-item">
+                      {feat[0].properties.longitude}
+                    </Typography>
+                    <Typography variant="h5">Province</Typography>
+                    <Typography class="popup-item">
+                      {feat[0].properties.province}
+                    </Typography>
+                    <Typography variant="h5">Land cover</Typography>
+                    <Typography class="popup-item">
+                      {feat[0].properties.cec_landcover_sector_long}
+                    </Typography>
+                  </div>
+                </Popup>,
+              );
             }
-            setPopup(
-              <Popup
-                latitude={e.lngLat.lat}
-                longitude={e.lngLat.lng}
-                closeOnClick={false}
-                onClose={() => setShowPopup(false)}
-                closeButton={true}
-              >
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: popupText.join("<hr>"),
-                  }}
-                ></div>
-              </Popup>,
-            );
           }
         }}
         mapStyle={{

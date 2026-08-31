@@ -1,0 +1,44 @@
+.popup-content {
+  padding: 10px 5px;
+  text-align: left;
+}
+
+.popup-content h5 {
+  padding: 10px 0 2px 0;
+  font-size: 0.8rem;
+  color: #636363;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.popup-title {
+  margin: 12px 0 0px 0;
+  background-color: #5a5f77;
+  color: white;
+  padding: 8px 12px;
+}
+
+.popup-item {
+  margin: 0px 0;
+}
+
+.maplibregl-popup-close-button,
+.maplibregl-popup-close-button:hover {
+  font-size: 1.5rem;
+  border-radius: 15px;
+  cursor: pointer;
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  padding: 0px 8px;
+  border: 1px solid #333;
+  background: #e1e1e1;
+}
+
+.maplibregl-popup-close-button:hover {
+  font-weight: bold;
+}
+
+.maplibregl-popup-content {
+  border-radius: 10px;
+}
