@@ -1,14 +1,13 @@
 .selector-frame {
   background-color: transparent;
   display: flex;
-  width: 100%;
   height: fit-content;
   justify-content: left;
   align-items: center;
   pointer-events: none;
   position: absolute;
   bottom: 0;
-  right: 0;
+  left: 0;
   z-index: 1000;
   cursor: default;
 }
@@ -47,7 +46,9 @@
   padding: 5px;
   min-width: 50px;
   min-height: 50px;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
   cursor: pointer;
 }
 
@@ -64,7 +65,9 @@
   height: fit-content;
   overflow: hidden;
   padding: 2px;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .collapsible {

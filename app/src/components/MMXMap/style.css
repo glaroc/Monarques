@@ -1,5 +1,5 @@
 .popup-content {
-  padding: 10px 5px;
+  padding: 0px;
   text-align: left;
 }
 
@@ -10,14 +10,6 @@
   font-weight: bold;
   text-transform: uppercase;
 }
-
-.popup-title {
-  margin: 12px 0 0px 0;
-  background-color: #5a5f77;
-  color: white;
-  padding: 8px 12px;
-}
-
 .popup-item {
   margin: 0px 0;
 }
@@ -41,4 +33,9 @@
 
 .maplibregl-popup-content {
   border-radius: 10px;
+  padding: 0;
+}
+
+.popup-details {
+  padding: 20px;
 }

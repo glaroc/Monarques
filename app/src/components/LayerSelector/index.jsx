@@ -67,30 +67,35 @@ const LayerItem = ({ layer, onSelectLayer, ...rest }) => {
 export const LayerSelector = ({ notifyLayerChange }) => {
   const [expand, setExpand] = useState(false);
 
+  const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
+
   const layers = [
     {
+      type: "tiles",
       layer_source_url: "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
       layer_snapshot: googleHybrid,
       layer_title: "Google Hybrid",
     },
     {
+      type: "tiles",
       layer_source_url: "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
       layer_snapshot: googleMaps,
       layer_title: "Google Maps",
     },
     {
-      layer_source_url:
-        "https://01.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      type: "style",
+      layer_source_url: `https://api.maptiler.com/maps/dataviz-v4-dark/tiles.json?key=${key}`,
       layer_snapshot: cartoDark,
       layer_title: "Dark basemap",
     },
     {
-      layer_source_url:
-        "https://01.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png",
+      type: "style",
+      layer_source_url: `https://api.maptiler.com/maps/outdoor-v4/tiles.json?key=${key}`,
       layer_snapshot: carto,
       layer_title: "Light basemap",
     },
     {
+      type: "tiles",
       layer_source_url:
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       layer_snapshot: esriSatellite,
