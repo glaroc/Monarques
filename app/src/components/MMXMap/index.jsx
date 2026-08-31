@@ -13,13 +13,22 @@ import {
   addProtocol,
   removeProtocol,
   setWorkerCount,
+  setWorkerUrl,
 } from "maplibre-gl";
+// maplibre v6 resolves its worker at runtime from import.meta.url, i.e. next to
+// the hashed bundle in dist/assets, where the build emits no worker file. The
+// request then falls through to index.html and the browser blocks it on MIME
+// type, leaving the map with no tiles. Letting Vite bundle and emit the worker
+// itself gives us a URL that is correct under any base path.
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Protocol } from "pmtiles";
 import { Typography, Box } from "@mui/material";
 import "./style.css";
 import { categories } from "./variables";
 import _ from "lodash";
+
+setWorkerUrl(maplibreWorkerUrl);
 
 const buildPointsLayer = (filter) => ({
   id: "points",
